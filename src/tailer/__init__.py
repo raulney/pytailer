@@ -150,7 +150,7 @@ class Tailer(object):
         else:
             return []
 
-    def follow(self, delay=1.0):
+    def follow(self, delay=1.0, filter=None):
         """\
         Iterator generator that returns lines as data is added to the file.
 
@@ -173,7 +173,10 @@ class Tailer(object):
                     if line[-1:] == '\r\n' and '\r\n' in self.line_terminators:
                         # found crlf
                         line = line[:-1]
-
+                if(filter):
+                    if(filter not in line):
+                        trailing = False
+                        continue
                 trailing = False
                 yield line
             else:
@@ -213,7 +216,7 @@ def head(file, lines=10):
     """
     return Tailer(file).head(lines)
 
-def follow(file, delay=1.0):
+def follow(file, delay=1.0, filter=None):
     """\
     Iterator generator that returns lines as data is added to the file.
 
@@ -233,7 +236,7 @@ def follow(file, delay=1.0):
     >>> fo.close()
     >>> os.remove('test_follow.txt')
     """
-    return Tailer(file, end=True).follow(delay)
+    return Tailer(file, end=True).follow(delay, filter)
 
 def _test():
     import doctest
